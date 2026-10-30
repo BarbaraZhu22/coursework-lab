@@ -1,5 +1,5 @@
 import { allCards, chapters, rules, torchSteps, words } from "@/lib/content";
-import type { Store } from "@/lib/storage";
+import type { CursorKey, Store } from "@/lib/storage";
 
 const known = new Set(allCards.map((card) => card.id));
 
@@ -27,6 +27,26 @@ export function sectionScored(store: Store) {
     torch: count(store, torchSteps.map((card) => card.id)),
     path: count(store, chapters.map((chapter) => chapter.check.id)),
   };
+}
+
+export function sectionIds(key: CursorKey) {
+  if (key === "words") return words.map((card) => card.id);
+  if (key === "rules") return rules.map((card) => card.id);
+  if (key === "torch") return torchSteps.map((card) => card.id);
+  return chapters.map((chapter) => chapter.check.id);
+}
+
+export function sectionHasRecord(store: Store, key: CursorKey) {
+  return sectionIds(key).some((id) => store.attempts[id]);
+}
+
+export function withoutSection(store: Store, key: CursorKey): Store {
+  const drop = new Set(sectionIds(key));
+  const attempts: Store["attempts"] = {};
+  for (const [id, attempt] of Object.entries(store.attempts)) {
+    if (!drop.has(id)) attempts[id] = attempt;
+  }
+  return { attempts, cursor: { ...store.cursor, [key]: 0 } };
 }
 
 export function norm(value: string) {

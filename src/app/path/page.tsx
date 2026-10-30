@@ -2,7 +2,8 @@
 
 import { CardView } from "@/components/CardView";
 import { chapters } from "@/lib/content";
-import { useStore } from "@/lib/storage";
+import { withoutSection } from "@/lib/score";
+import { readStore, useStore, writeStore } from "@/lib/storage";
 
 export default function PathPage() {
   const { store, ready, update } = useStore();
@@ -62,7 +63,16 @@ export default function PathPage() {
         </p>
       </article>
       <CardView key={chapter.check.id} card={chapter.check} />
-      <div className="flex justify-between">
+      <div className="flex items-center justify-between gap-3">
+        <button
+          type="button"
+          className="text-sm text-[var(--muted)] underline disabled:no-underline disabled:opacity-40"
+          disabled={chapters.every((item) => !store.attempts[item.check.id])}
+          onClick={() => writeStore(withoutSection(readStore(), "path"))}
+        >
+          只清空这一部分
+        </button>
+        <span className="flex gap-2">
         <button type="button" onClick={() => go(index - 1)} disabled={index === 0} className="rounded-full px-4 py-2 disabled:opacity-40">
           上一题
         </button>
@@ -74,6 +84,7 @@ export default function PathPage() {
         >
           下一题
         </button>
+        </span>
       </div>
     </div>
   );

@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { Cat, moodFor } from "@/components/Cat";
-import { scored, sectionScored, totals } from "@/lib/score";
-import { emptyStore, useStore, writeStore } from "@/lib/storage";
+import { scored, sectionHasRecord, sectionScored, totals, withoutSection } from "@/lib/score";
+import { readStore, useStore, writeStore, type CursorKey } from "@/lib/storage";
 
 const lanes = [
   { href: "/words", key: "words" as const, title: "认词", text: "欠拟合、验证集、噪声下限。先能用作业里的词说出拟合到了什么。" },
@@ -38,15 +38,25 @@ export default function HomePage() {
 
       <section className="grid gap-3">
         {lanes.map((lane) => (
-          <Link key={lane.href} href={lane.href} className="rounded-3xl bg-white/80 p-4 ring-1 ring-[var(--line)]">
-            <div className="flex items-baseline justify-between gap-3">
-              <h2 className="font-semibold">{lane.title}</h2>
-              <span className="text-sm text-[var(--muted)]">
-                {parts[lane.key]}/{totals[lane.key]}
-              </span>
-            </div>
-            <p className="mt-1 text-sm leading-6 text-[var(--muted)]">{lane.text}</p>
-          </Link>
+          <div key={lane.href} className="rounded-3xl bg-white/80 p-4 ring-1 ring-[var(--line)]">
+            <Link href={lane.href} className="block">
+              <div className="flex items-baseline justify-between gap-3">
+                <h2 className="font-semibold">{lane.title}</h2>
+                <span className="text-sm text-[var(--muted)]">
+                  {parts[lane.key]}/{totals[lane.key]}
+                </span>
+              </div>
+              <p className="mt-1 text-sm leading-6 text-[var(--muted)]">{lane.text}</p>
+            </Link>
+            <button
+              type="button"
+              className="mt-2 text-sm text-[var(--muted)] underline disabled:no-underline disabled:opacity-40"
+              disabled={!ready || !sectionHasRecord(store, lane.key)}
+              onClick={() => clearSection(lane.key)}
+            >
+              只清空这一部分
+            </button>
+          </div>
         ))}
       </section>
 
@@ -56,18 +66,15 @@ export default function HomePage() {
 python make_data.py
 python exercise1.py`}</pre>
         <p className="mt-2 text-[var(--muted)]">
-          截止 11 月 26 日 13:00，占单元成绩 30%。题目自己估计连写报告大约 6 到 8 小时。一次训练若要几分钟，就是写错了。
+          截止 11 月 26 日 13:00，占单元成绩 30%。题目自己估计连写报告大约 6 到 8 小时。一次训练若要几分钟，就是写错了。清空只作用于上面点的那一部分，看过答案和已经对上的题会一起从那一部分拿掉，另外三部分还在。
         </p>
-        <button
-          type="button"
-          className="mt-3 text-sm text-[var(--muted)] underline"
-          onClick={() => writeStore(emptyStore())}
-        >
-          清空这台浏览器里的对齐记录
-        </button>
       </section>
     </main>
   );
+}
+
+function clearSection(key: CursorKey) {
+  writeStore(withoutSection(readStore(), key));
 }
 
 function Split({ name, text }: { name: string; text: string }) {

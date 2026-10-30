@@ -2,7 +2,8 @@
 
 import type { Card } from "@/lib/content";
 import { CardView } from "@/components/CardView";
-import { useStore, type CursorKey } from "@/lib/storage";
+import { withoutSection } from "@/lib/score";
+import { readStore, useStore, writeStore, type CursorKey } from "@/lib/storage";
 
 export function Deck({
   cards,
@@ -36,7 +37,16 @@ export function Deck({
         <span>{cards.filter((item) => store.attempts[item.id]?.status === "scored").length} 题已对齐</span>
       </div>
       <CardView key={card.id} card={card} />
-      <div className="flex justify-between">
+      <div className="flex items-center justify-between gap-3">
+        <button
+          type="button"
+          className="text-sm text-[var(--muted)] underline disabled:no-underline disabled:opacity-40"
+          disabled={cards.every((item) => !store.attempts[item.id])}
+          onClick={() => writeStore(withoutSection(readStore(), cursorKey))}
+        >
+          只清空这一部分
+        </button>
+        <span className="flex gap-2">
         <button type="button" onClick={() => go(index - 1)} disabled={index === 0} className="rounded-full px-4 py-2 disabled:opacity-40">
           上一题
         </button>
@@ -48,6 +58,7 @@ export function Deck({
         >
           下一题
         </button>
+        </span>
       </div>
     </div>
   );

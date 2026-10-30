@@ -1,0 +1,78 @@
+@import "tailwindcss";
+
+:root {
+  color-scheme: light;
+  --ink: #4a322c;
+  --muted: #8a675c;
+  --cream: #fff3ea;
+  --card: #fffaf6;
+  --line: #f0d8cc;
+  --coral: #e07a5f;
+  --leaf: #6e8b6a;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at 12% 8%, #ffe7d6 0 18%, transparent 19%),
+    radial-gradient(circle at 88% 0%, #fde2ea 0 16%, transparent 17%),
+    var(--cream);
+  font-family: "Avenir Next", "PingFang SC", "Hiragino Sans GB", "Noto Sans SC", sans-serif;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+.paw {
+  background-image: radial-gradient(circle at 30% 40%, #f6c7b4 2px, transparent 2.5px);
+  background-size: 22px 22px;
+}
+
+@keyframes cheer-rise {
+  0% {
+    transform: translateY(18vh) scale(0.85) rotate(-8deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-75vh) scale(1.05) rotate(16deg);
+    opacity: 0;
+  }
+}
+
+@keyframes cheer-pop {
+  0% {
+    transform: translate(-50%, 8px) scale(0.92);
+    opacity: 1;
+  }
+  18% {
+    transform: translate(-50%, 0) scale(1.06);
+    opacity: 1;
+  }
+  72% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -10px) scale(1);
+    opacity: 0;
+  }
+}
+
+.cheer-bit {
+  position: absolute;
+  bottom: 8%;
+  animation-name: cheer-rise;
+  animation-timing-function: ease-out;
+  animation-fill-mode: forwards;
+}
+
+.cheer-banner {
+  position: absolute;
+  left: 50%;
+  top: 28%;
+  animation: cheer-pop 1.7s ease-out forwards;
+}
